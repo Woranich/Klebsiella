@@ -1,10 +1,17 @@
-#convert bax to bam files using bax2bam
-
 #create txt file from list of bax files
 ls *.1.bax.h5 > bax1.txt #manage in excel to get the prefix of the file
 ls *.2.bax.h5 > bax2.txt
 ls *.3.bax.h5 > bax3.txt
+# create the table with prefix and files name in 4 column using excel
 
-cat bax2bam.txt | parallel -j 2 --col-sep "\t" --bar  "bax2bam -o {1} {2} {3} {4}"
+#create the txt file containing the prefix and files name
+nano bax2bam.txt
 
+#convert bax files to bam files using bax2bam
+cat bax2bam.txt | parallel -j 2 --col-sep "\t" --bar "bax2bam -o {1} {2} {3} {4}"
+
+#generate HIFI with kinetics with ccs
+cat subreads_bam.txt | parallel -j 4 --bar "ccs {1} {2} --hifi-kinetics
+
+#convert bam files to 
 cat subreads_bam.txt | parallel -j 2 --bar "ccs-kinetics-bystrandify {1} {2}
