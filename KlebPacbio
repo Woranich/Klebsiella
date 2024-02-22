@@ -8,11 +8,15 @@ cat > MTB_Fastq.txt
 
 #2.copy SRR.. number that we want to download to SRR.txt 
 Then control d (to save)
+
 #3.Then run the following to create the link to downlaod from ena
 cat SRR.txt | python err_download.py > fastq_file_link_names.txt
 
 #4.Then use xargs to run wget 
 cat fastq_file_link_names.txt | xargs -I {} -P 20 sh -c "wget {}"
+
+#download file from ENA .sh script
+bash *.sh
 
 #create txt file from list of bax files
 ls *.1.bax.h5 > bax1.txt #manage in excel to get the prefix of the file
