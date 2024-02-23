@@ -1,5 +1,6 @@
 #Screen first because this can take more time
 
+##For downloading the sequence using ENA accession number
 #0.make directory for collecting fastq 
 mkdir fastq
 
@@ -15,8 +16,13 @@ cat SRR.txt | python err_download.py > fastq_file_link_names.txt
 #4.Then use xargs to run wget 
 cat fastq_file_link_names.txt | xargs -I {} -P 20 sh -c "wget {}"
 
-#download file from ENA .sh script
-bash *.sh
+##For downloading files from ENA .sh script
+for script in *.sh; do
+    if [ -f "$script" ]; then
+        echo "Running script: $script"
+        bash "$script"
+    fi
+done
 
 #create txt file from list of bax files
 ls *.1.bax.h5 > bax1.txt #manage in excel to get the prefix of the file
