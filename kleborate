@@ -1,1 +1,36 @@
+Klebsiella script
+> scp -r /Users/woranichhinthong/Documents/Klebsiella/pacbio_kleb_raw woranich@10.18.0.95:/mnt/storage7/woranich/
+> for file in *.sh; do
+    echo "$file" >> kleb_pacbio_sh_urls.txt
+done
+> cat kleb_pacbio_sh_urls.txt | xargs -P 10 -I {} wget {}
+> directory="/mnt/storage7/woranich/pacbio_kleb_raw"
+for file in "$directory"/*; do
+  if [ -f "$file" ]; then
+    sh "$file"
+  fi
+done
+
+> fasta_directory="/mnt/storage7/woranich/klebsiella"
+output_dir="/mnt/storage7/woranich/quast_kleb"
+for fasta_file in "$fasta_directory"/*.fasta; do
+    if [ -f "$fasta_file" ]; then
+        echo "Running QUAST on $(basename "$fasta_file")..."
+        quast.py "$fasta_file" -o "$output_dir/$(basename "$fasta_file")_quast"
+    fi
+done
+echo "QUAST analysis completed."
+> scp -r woranich@10.18.0.95:/mnt/storage7/woranich/quast_kleb /Users/woranichhinthong/Documents/Klebsiella
+
+> FASTA_DIRECTORY="/mnt/storage7/woranich/klebsiella"
+OUTPUT_DIRECTORY="/mnt/storage7/woranich/klebsiella/kleborate_output"
+FASTA_FILES=("$FASTA_DIRECTORY"/*.fasta)
+for fasta_file in "${FASTA_FILES[@]}"; do
+    fasta_name=$(basename -- "$fasta_file" .fasta)
+    output_file="$OUTPUT_DIRECTORY/${fasta_name}_kleborate_output.txt"
+    kleborate -a "$fasta_file" --all -o "$output_file"
+done
+> scp -r woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/kleborate_output /Users/woranichhinthong/Documents/Klebsiella
+> kleborate -a *.fasta --all -o Matt_kleborate_result.txt
+> scp woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/Matt_kleborate_result.txt /Users/woranichhinthong/Documents/Klebsiella
 
