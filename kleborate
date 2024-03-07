@@ -1,5 +1,7 @@
 Klebsiella script
 > scp -r /Users/woranichhinthong/Documents/Klebsiella/pacbio_kleb_raw woranich@10.18.0.95:/mnt/storage7/woranich/
+
+#To download files from ENA .sh (or use bash command)
 > for file in *.sh; do
     echo "$file" >> kleb_pacbio_sh_urls.txt
 done
@@ -33,4 +35,25 @@ done
 > scp -r woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/kleborate_output /Users/woranichhinthong/Documents/Klebsiella
 > kleborate -a *.fasta --all -o Matt_kleborate_result.txt
 > scp woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/Matt_kleborate_result.txt /Users/woranichhinthong/Documents/Klebsiella
+
+#Create txt file containing list of 3 bax files and output prefix
+>nano bax2bam2.txt #put output prefix in column 1
+
+#convert bax2bam
+>cat bax2bam2.txt | parallel -j 2 --col-sep "\t" --bar "bax2bam -o {1} {2} {3} {4}"
+
+#Create txt file containing list of bam files and output prefix
+>nano bam2fastq.txt #put output prefix in column 2
+
+#convert bam to fasta with bam2fastx
+>mamba create -n bam2fastx bam2fastx
+
+#convert bam to fasta with bam2fastx
+>cat bam2fasta.txt | parallel -j 2 --col-sep "\t" --bar "bam2fasta -o {2} {1}"
+
+#analyse fasta files using kleborate
+>kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
+
+
+
 
