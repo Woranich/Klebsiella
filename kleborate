@@ -48,10 +48,15 @@ done
 #convert bam to fasta with bam2fastx
 >mamba create -n bam2fastx bam2fastx
 
-#convert bam to fasta with bam2fastx
+#convert bam to fasta.gz with bam2fastx
+>mamba activate bam2fastx
 >cat bam2fasta.txt | parallel -j 2 --col-sep "\t" --bar "bam2fasta -o {2} {1}"
 
-#analyse fasta files using kleborate
+#unzip .fasta.gz to .fasta file
+>gunzip -k *.fasta.gz
+
+#analyse fasta files using kleborate #INPUT with .fasta ONLY!!!!
+>mamba activate kleborate
 >kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
 
 
