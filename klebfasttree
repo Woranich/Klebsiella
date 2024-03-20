@@ -1,0 +1,19 @@
+#Create text file containing the all the sequences from multiple fasta files
+#!/bin/bash
+
+# Define the output file
+output_file="kleb_all_sequences.fasta"
+
+# Loop through all fasta files in the current directory
+for file in *.fasta; do
+    # Extract filename without extension
+    filename=$(basename "$file" .fasta)
+    # Append sequences from the current file to the output file, replacing sequence headers with filename
+    sed "s/^>.*/>$filename/g" "$file" >> "$output_file"
+    # Add a newline after each file's content
+    echo >> "$output_file"
+done
+
+#make alignment fasta file from MAFFT
+mamba activate mafft
+mafft --auto kleb_all_sequences.fasta > kleb_aln.fasta
