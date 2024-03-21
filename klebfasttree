@@ -21,3 +21,4 @@ mafft --auto kleb_all_sequences.fasta > kleb_aln.fasta
 #create phylogenetic tree from nucleotide alignment fasta file with FastTree
 mamba activate fasttree
 FastTree -nt -gtr -gamma kleb_aln.fasta > klebpakistan.tre
+
