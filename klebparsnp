@@ -1,0 +1,11 @@
+#This is to create the tree from parsnp using core genome
+
+#Install parsnp via mamba
+mamba create -n parsnp parsnp
+mamba activate parsnp
+
+#check the total number of nucleotides (characters) in the sequences
+grep -v ">" file.fasta | wc | awk '{print $3-$1}'
+
+#run parsnp with fasta files
+parsnp -r kpref.fasta -d ./*.fasta
