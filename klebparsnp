@@ -8,4 +8,6 @@ mamba activate parsnp
 grep -v ">" file.fasta | wc | awk '{print $3-$1}'
 
 #run parsnp with fasta files
-parsnp -r kpref.fasta -d ./*.fasta
+parsnp -r NTUH-K2044.fasta -d ./*.fasta -o parsnp_output
+
+
