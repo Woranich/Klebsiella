@@ -1,19 +1,19 @@
-Klebsiella script
-> scp -r /Users/woranichhinthong/Documents/Klebsiella/pacbio_kleb_raw woranich@10.18.0.95:/mnt/storage7/woranich/
+#Klebsiella script
+scp -r /Users/woranichhinthong/Documents/Klebsiella/pacbio_kleb_raw woranich@10.18.0.95:/mnt/storage7/woranich/
 
 #To download files from ENA .sh (or use bash command)
-> for file in *.sh; do
+for file in *.sh; do
     echo "$file" >> kleb_pacbio_sh_urls.txt
 done
-> cat kleb_pacbio_sh_urls.txt | xargs -P 10 -I {} wget {}
-> directory="/mnt/storage7/woranich/pacbio_kleb_raw"
+cat kleb_pacbio_sh_urls.txt | xargs -P 10 -I {} wget {}
+directory="/mnt/storage7/woranich/pacbio_kleb_raw"
 for file in "$directory"/*; do
   if [ -f "$file" ]; then
     sh "$file"
   fi
 done
 
-> fasta_directory="/mnt/storage7/woranich/klebsiella"
+fasta_directory="/mnt/storage7/woranich/klebsiella"
 output_dir="/mnt/storage7/woranich/quast_kleb"
 for fasta_file in "$fasta_directory"/*.fasta; do
     if [ -f "$fasta_file" ]; then
@@ -22,9 +22,10 @@ for fasta_file in "$fasta_directory"/*.fasta; do
     fi
 done
 echo "QUAST analysis completed."
-> scp -r woranich@10.18.0.95:/mnt/storage7/woranich/quast_kleb /Users/woranichhinthong/Documents/Klebsiella
 
-> FASTA_DIRECTORY="/mnt/storage7/woranich/klebsiella"
+scp -r woranich@10.18.0.95:/mnt/storage7/woranich/quast_kleb /Users/woranichhinthong/Documents/Klebsiella
+
+FASTA_DIRECTORY="/mnt/storage7/woranich/klebsiella"
 OUTPUT_DIRECTORY="/mnt/storage7/woranich/klebsiella/kleborate_output"
 FASTA_FILES=("$FASTA_DIRECTORY"/*.fasta)
 for fasta_file in "${FASTA_FILES[@]}"; do
@@ -32,28 +33,29 @@ for fasta_file in "${FASTA_FILES[@]}"; do
     output_file="$OUTPUT_DIRECTORY/${fasta_name}_kleborate_output.txt"
     kleborate -a "$fasta_file" --all -o "$output_file"
 done
-> scp -r woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/kleborate_output /Users/woranichhinthong/Documents/Klebsiella
-> kleborate -a *.fasta --all -o Matt_kleborate_result.txt
-> scp woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/Matt_kleborate_result.txt /Users/woranichhinthong/Documents/Klebsiella
+
+scp -r woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/kleborate_output /Users/woranichhinthong/Documents/Klebsiella
+kleborate -a *.fasta --all -o Matt_kleborate_result.txt
+scp woranich@10.18.0.95:/mnt/storage7/woranich/klebsiella/Matt_kleborate_result.txt /Users/woranichhinthong/Documents/Klebsiella
 
 #Create txt file containing list of 3 bax files and output prefix
->nano bax2bam2.txt #put output prefix in column 1
+nano bax2bam2.txt #put output prefix in column 1
 
 #convert bax2bam
->cat bax2bam2.txt | parallel -j 2 --col-sep "\t" --bar "bax2bam -o {1} {2} {3} {4}"
+cat bax2bam2.txt | parallel -j 2 --col-sep "\t" --bar "bax2bam -o {1} {2} {3} {4}"
 
 #Create txt file containing list of bam files and output prefix
->nano bam2fastq.txt #put output prefix in column 2
+nano bam2fastq.txt #put output prefix in column 2
 
 #convert bam to fasta with bam2fastx
->mamba create -n bam2fastx bam2fastx
+mamba create -n bam2fastx bam2fastx
 
 #convert bam to fasta.gz with bam2fastx
->mamba activate bam2fastx
->cat bam2fasta.txt | parallel -j 2 --col-sep "\t" --bar "bam2fasta -o {2} {1}"
+mamba activate bam2fastx
+cat bam2fasta.txt | parallel -j 2 --col-sep "\t" --bar "bam2fasta -o {2} {1}"
 
 #unzip .fasta.gz to .fasta file
->gunzip -k *.fasta.gz #NOTE! that the fasta files will contain the extra header lines between sequence
+gunzip -k *.fasta.gz #NOTE! that the fasta files will contain the extra header lines between sequence
 
 #remove all headers in the fasta file
 grep -v "^>" ERS1106942cp2.fasta > temp.fasta && mv temp.fasta ERS1106942cp2.fasta #NOTE! This will remove all lines starting with ">" and overwrite the former file
@@ -62,8 +64,8 @@ grep -v "^>" ERS1106942cp2.fasta > temp.fasta && mv temp.fasta ERS1106942cp2.fas
 tr -d '\n' < new_ERS1106942cp2.fasta > temp.fasta && mv temp.fasta new_ERS1106942cp2.fasta #NOTE! This will make the continuous sequence without any gap
 
 #analyse fasta files using kleborate #INPUT with .fasta ONLY!!!!
->mamba activate kleborate
->kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
+mamba activate kleborate
+kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
 
 
 
