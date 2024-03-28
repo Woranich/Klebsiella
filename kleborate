@@ -53,7 +53,13 @@ done
 >cat bam2fasta.txt | parallel -j 2 --col-sep "\t" --bar "bam2fasta -o {2} {1}"
 
 #unzip .fasta.gz to .fasta file
->gunzip -k *.fasta.gz
+>gunzip -k *.fasta.gz #NOTE! that the fasta files will contain the extra header lines between sequence
+
+#remove all headers in the fasta file
+grep -v "^>" ERS1106942cp2.fasta > temp.fasta && mv temp.fasta ERS1106942cp2.fasta #NOTE! This will remove all lines starting with ">" and overwrite the former file
+
+#remove all the new line in the fasta file
+tr -d '\n' < new_ERS1106942cp2.fasta > temp.fasta && mv temp.fasta new_ERS1106942cp2.fasta #NOTE! This will make the continuous sequence without any gap
 
 #analyse fasta files using kleborate #INPUT with .fasta ONLY!!!!
 >mamba activate kleborate
