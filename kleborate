@@ -63,6 +63,17 @@ grep -v "^>" ERS1106942cp2.fasta > temp.fasta && mv temp.fasta ERS1106942cp2.fas
 #remove all the new line in the fasta file
 tr -d '\n' < new_ERS1106942cp2.fasta > temp.fasta && mv temp.fasta new_ERS1106942cp2.fasta #NOTE! This will make the continuous sequence without any gap
 
+#!/bin/bash
+
+# Input file path
+input_file="new_ERS1106942cp2.fasta"
+
+# Define the header
+header=">ERS1106942cp"
+
+# Add the header to the first line of the file (overwrite the original file)
+echo "${header}" | cat - "${input_file}" > temp && mv temp "${input_file}"
+
 #analyse fasta files using kleborate #INPUT with .fasta ONLY!!!!
 mamba activate kleborate
 kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
