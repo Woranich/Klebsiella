@@ -4,6 +4,18 @@
 mamba create -n parsnp parsnp
 mamba activate parsnp
 
+#create the txt file containing the files name
+ls *.fasta > sample_name.txt 
+
+#open the txt editor to remove unwanted file name
+nano sample_name.txt
+
+#create the new directory for the sample
+mkdir qc_samples
+
+#move the file to new directory
+cat sample_name.txt | parallel 
+
 #check the total number of nucleotides (characters) in the sequences to check the genome size
 grep -v ">" file.fasta | wc | awk '{print $3-$1}'
 
