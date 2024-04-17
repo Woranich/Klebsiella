@@ -41,3 +41,12 @@ cat subreads_bam.txt | parallel -j 4 --bar "ccs {1} {2} --hifi-kinetics
 
 #convert bam files to 
 cat subreads_bam.txt | parallel -j 2 --bar "ccs-kinetics-bystrandify {1} {2}
+
+#convert bam files to fasta.gz
+mamba create -n bam2fastx bam2fastx
+mamba activate bam2fastx
+bam2fasta -o ERS1049097 ERS1049097.subreads.bam
+
+#create assambly from fasta file
+flye --pacbio-raw ERS1049097.fasta --out-dir /mnt/storage7/woranich/klebNCTC/klebNCTCassembly --threads 4
+
