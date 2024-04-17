@@ -4,6 +4,9 @@
 mamba create -n parsnp parsnp
 mamba activate parsnp
 
+#check the total number of nucleotides (characters) in the sequences to check the genome size
+grep -v ">" file.fasta | wc | awk '{print $3-$1}'
+
 #create the txt file containing the files name
 ls *.fasta > sample_name.txt 
 
@@ -14,10 +17,7 @@ nano sample_name.txt
 mkdir qc_samples
 
 #move the file to new directory
-cat sample_name.txt | parallel 
-
-#check the total number of nucleotides (characters) in the sequences to check the genome size
-grep -v ">" file.fasta | wc | awk '{print $3-$1}'
+cat sample_name.txt | parallel -j 1 --bar mv {} ./qc_samples
 
 #run parsnp with fasta files
 parsnp -r NTUH-K2044.fasta -d ./*.fasta -o parsnp_output
