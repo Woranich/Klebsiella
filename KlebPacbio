@@ -49,4 +49,6 @@ bam2fasta -o ERS1049097 ERS1049097.subreads.bam
 
 #create assambly from fasta file
 flye --pacbio-raw ERS1049097.fasta --out-dir /mnt/storage7/woranich/klebNCTC/klebNCTCassembly --threads 4
+#create assembly from multiple fasta files in loop
+cat klebNCTCfasta.txt | parallel -j 4 --colsep '\t' --bar "flye --pacbio-raw {1} --out-dir /mnt/storage7/woranich/klebNCTC/klebNCTCassembly/{2}_assembly --threads 4"
 
