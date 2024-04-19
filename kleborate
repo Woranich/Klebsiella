@@ -13,6 +13,11 @@ for file in "$directory"/*; do
   fi
 done
 
+#Using bash command to download multiple .sh files in the same directory
+for script in *.sh; do
+    bash "$script"
+done
+
 fasta_directory="/mnt/storage7/woranich/klebsiella"
 output_dir="/mnt/storage7/woranich/quast_kleb"
 for fasta_file in "$fasta_directory"/*.fasta; do
