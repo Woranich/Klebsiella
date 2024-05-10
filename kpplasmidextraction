@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Input directory containing FASTA files
+input_dir="/mnt/storage7/woranich/klebsiella"
+
+# Loop through each FASTA file in the input directory
+for fasta_file in $input_dir/*.fasta; do
+    # Extract filename without extension
+    filename=$(basename -- "$fasta_file")
+    filename_no_ext="${filename%.*}"
+    # Indicate the name list for output directory
+    output_dir="$filename_no_ext"
+    # Run mob_recon command
+    mob_recon --infile "$fasta_file" --outdir "$output_dir"
+done
