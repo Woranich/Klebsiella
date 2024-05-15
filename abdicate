@@ -1,0 +1,8 @@
+# This is to run arbricate on various database
+# Go to the working directory containing fasta/fastq files
+
+# Run abricate
+abricate --db [name of database] *.fasta > output.tab
+
+# Chnage the .tab file to .txt file
+mv output.tab output.txt
