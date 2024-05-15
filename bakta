@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Path to the directory containing your FASTA files
+fasta_dir="path/to/directory/containing/fasta_files"
+
+# Path to the BAKTA database
+bakta_db="/mnt/storage7/woranich/miniforge3/envs/bakta/db"
+
+# Loop through each FASTA file in the directory
+for fasta_file in "$fasta_dir"/*.fasta; do
+    # Run BAKTA command for each FASTA file
+    bakta --db "$bakta_db" "$fasta_file"
+done
