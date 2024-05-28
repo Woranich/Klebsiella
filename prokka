@@ -1,0 +1,15 @@
+...This is to annotate the pangenome
+#!/bin/bash
+
+# Directory containing your FASTA files
+INPUT_DIR="/path/to/your/fasta/files"
+# Output directory where Prokka results will be stored
+OUTPUT_DIR="/path/to/output/directory"
+
+# Loop over each FASTA file in the input directory
+for fasta_file in "$INPUT_DIR"/*.fasta; do
+    # Extract the base name of the file (without path and extension)
+    base_name=$(basename "$fasta_file" .fasta)
+    # Run Prokka with the appropriate parameters
+    prokka --outdir "$OUTPUT_DIR/${base_name}" --prefix "$base_name" "$fasta_file"
+done
