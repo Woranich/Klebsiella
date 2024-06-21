@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Define the output directory
+OUTPUT_DIR=kp_asia_assembly
+
+# Create the output directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
+
+# Loop through all _1.fastq.gz files in the current directory
+for file1 in *_1.fastq.gz
+do
+    # Derive the base name of the file (remove suffix)
+    base=$(basename "$file1" _1.fastq.gz)
+
+    # Define the corresponding _2.fastq.gz file
+    file2="${base}_2.fastq.gz"
+
+    # Define the output directory for this pair
+    sample_output="${OUTPUT_DIR}/${base}_asm"
+
+    # Run spades.py
+    spades.py -1 "$file1" -2 "$file2" -o "$sample_output"
+done
