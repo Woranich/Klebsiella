@@ -21,3 +21,49 @@ do
     # Run spades.py
     spades.py -1 "$file1" -2 "$file2" -o "$sample_output"
 done
+
+###Store assemblies in the new directory###
+
+#!/bin/bash
+
+# Define the destination directory
+dest_dir="kp_asia_asm"
+
+# Create the destination directory if it doesn't exist
+mkdir -p "$dest_dir"
+
+# Iterate through each subdirectory
+for dir in */; do
+    # Check if the directory contains a scaffolds.fasta file
+    if [ -f "$dir/scaffolds.fasta" ]; then
+        # Get the base name of the directory
+        base_name=$(basename "$dir")
+
+        # Define the new file name with the directory name as prefix
+        new_file_name="${base_name}_scaffolds.fasta"
+
+        # Copy the file to the destination directory with the new name
+        cp "$dir/scaffolds.fasta" "$dest_dir/$new_file_name"
+    fi
+done
+
+echo "All scaffolds.fasta files have been copied to $dest_dir with appropriate prefixes."
+
+###rename assembly files###
+
+#!/bin/bash
+
+# Iterate through each file that matches the pattern
+for file in *_asm_scaffolds.fasta; do
+    # Extract the base name (without _asm_scaffolds.fasta part)
+    base_name="${file%%_asm_scaffolds.fasta}"
+
+    # Define the new file name
+    new_file_name="${base_name}.fasta"
+
+    # Rename the file
+    mv "$file" "$new_file_name"
+done
+
+echo "All files have been renamed."
+
