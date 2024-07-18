@@ -1,0 +1,1 @@
+mefinder find -c ./WMW942_plasmid_AD443.fasta WMW942_plasmid_AD443 --blastn-path /mnt/storage7/woranich/ncbi-blast-2.16.0+/bin/blastn
