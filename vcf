@@ -1,0 +1,12 @@
+#Fastq2vcf use fastq2matrix
+mamba activate fastq2matrix
+
+#merge vcf files
+bcftools merge -o kp_merged.vcf -O v *.vcf.gz
+
+#intall vcftools
+mamba intall vcftools
+
+#Extract SNPs
+bcftools view -v snps kp_merged.vcf -o snps.vcf
+
