@@ -1,8 +1,9 @@
 #Fastq2vcf use fastq2matrix
 mamba activate fastq2matrix
 
-#merge vcf files
+#merge vcf files and do the query with bcftools
 bcftools merge -o kp_merged.vcf -O v *.vcf.gz
+bcftools query -f '%POS\t%REF\t%ALT[\t%GT]\n' mtb.2020_06_24.genotyped.vcf.gz | head
 
 #intall vcftools
 mamba intall vcftools
