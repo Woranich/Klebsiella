@@ -10,3 +10,46 @@ mamba intall vcftools
 #Extract SNPs
 bcftools view -v snps kp_merged.vcf -o snps.vcf
 
+#calculate snps frequency
+vcftools --vcf snps.vcf --freq --out snp_summary
+
+
+#Customise and calcualte key feature using vcfpy
+import vcfpy
+
+# Open the VCF file
+reader = vcfpy.Reader.from_path('snps.vcf')
+
+# Prepare a list to store summary data
+snp_summary = []
+
+# Iterate over each record
+for record in reader:
+    # Extract basic information
+    chrom = record.CHROM
+    pos = record.POS
+    id_ = record.ID
+    ref = record.REF
+    alt = record.ALT[0].value  # ALT is a list, take the first alternate allele
+    qual = record.QUAL
+
+    # Extract sample genotypes
+    for call in record.calls:
+        sample = call.sample
+        genotype = call.data.get('GT')  # 'GT' is the genotype field
+
+        # Append the information to the summary list
+        snp_summary.append({
+            'CHROM': chrom,
+            'POS': pos,
+            'ID': id_,
+            'REF': ref,
+            'ALT': alt,
+            'QUAL': qual,
+            'SAMPLE': sample,
+            'GENOTYPE': genotype
+        })
+
+# Example: Output the first few entries
+for entry in snp_summary[:5]:
+    print(entry)
