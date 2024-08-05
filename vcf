@@ -2,13 +2,13 @@
 mamba activate fastq2matrix
 
 #merge vcf files and do the query with bcftools
+fastq2vcf.py all --read1 WMW1226_1.fastq.gz --read2 WMW1226_2.fastq.gz --ref NTUH-K2044.fasta --prefix WMW1226
 bcftools merge -o kp_merged.vcf -O v *.vcf.gz
 #or if you have a list of sample names
 # Create a list of VCF files from kp_pakistan.txt
 vcf_list=$(cat kp_pakistan.txt | tr '\n' ' ')
 # Run bcftools merge on all files at once
 bcftools merge -o kp_pakistan_merged.vcf.gz -O z $vcf_list
-
 
 bcftools query -f '%POS\t%REF\t%ALT[\t%GT]\n' mtb.2020_06_24.genotyped.vcf.gz | head
 
@@ -20,7 +20,6 @@ bcftools view -v snps kp_merged.vcf -o snps.vcf
 
 #calculate snps frequency
 vcftools --vcf snps.vcf --freq --out snp_summary
-
 
 #Customise and calcualte key feature using vcfpy
 import vcfpy
