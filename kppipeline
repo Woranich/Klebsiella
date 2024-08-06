@@ -1,1 +1,87 @@
-#Assemble the sequence from fastq files
+###Assemble the sequence from fastq files
+# Define the output directory
+OUTPUT_DIR=kp_asia_assembly
+
+# Create the output directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
+
+# Loop through all _1.fastq.gz files in the current directory
+for file1 in *_1.fastq.gz
+do
+    # Derive the base name of the file (remove suffix)
+    base=$(basename "$file1" _1.fastq.gz)
+
+    # Define the corresponding _2.fastq.gz file
+    file2="${base}_2.fastq.gz"
+
+    # Define the output directory for this pair
+    sample_output="${OUTPUT_DIR}/${base}_asm"
+
+    # Run spades.py
+    spades.py -1 "$file1" -2 "$file2" -o "$sample_output"
+done
+
+###Store assemblies in fasta format in the new directory###
+###Note to use "scaffolds.fasta" file
+
+#!/bin/bash
+
+# Define the destination directory
+dest_dir="kp_asia_asm"
+
+# Create the destination directory if it doesn't exist
+mkdir -p "$dest_dir"
+
+# Iterate through each subdirectory
+for dir in */; do
+    # Check if the directory contains a scaffolds.fasta file
+    if [ -f "$dir/scaffolds.fasta" ]; then
+        # Get the base name of the directory
+        base_name=$(basename "$dir")
+
+        # Define the new file name with the directory name as prefix
+        new_file_name="${base_name}_scaffolds.fasta"
+
+        # Copy the file to the destination directory with the new name
+        cp "$dir/scaffolds.fasta" "$dest_dir/$new_file_name"
+    fi
+done
+
+echo "All scaffolds.fasta files have been copied to $dest_dir with appropriate prefixes."
+
+###rename assembly files###
+
+#!/bin/bash
+
+# Iterate through each file that matches the pattern
+for file in *_asm_scaffolds.fasta; do
+    # Extract the base name (without _asm_scaffolds.fasta part)
+    base_name="${file%%_asm_scaffolds.fasta}"
+
+    # Define the new file name
+    new_file_name="${base_name}.fasta"
+
+    # Rename the file
+    mv "$file" "$new_file_name"
+done
+
+###analyse fasta files using kleborate #INPUT with .fasta ONLY!!!!
+##navigate to fasta files directory
+mamba activate kleborate
+kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
+
+###Extract plasmid and chromosome from fasta file using MOB-suite
+# Input directory containing FASTA files
+input_dir="/mnt/storage7/woranich/klebsiella"
+
+# Loop through each FASTA file in the input directory
+for fasta_file in $input_dir/*.fasta; do
+    # Extract filename without extension
+    filename=$(basename -- "$fasta_file")
+    filename_no_ext="${filename%.*}"
+    # Indicate the name list for output directory
+    output_dir="$filename_no_ext"
+    # Run mob_recon command
+    mob_recon --infile "$fasta_file" --outdir "$output_dir"
+done
+echo "All files have been renamed."
