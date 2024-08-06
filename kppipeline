@@ -70,6 +70,16 @@ done
 mamba activate kleborate
 kleborate -a *.fasta --all -o NCTC_kleborate_result.txt
 
+###Use Abricate to annotate virulence gene/resistant gene
+# This is to run arbricate on various database
+# Go to the working directory containing fasta/fastq files
+
+# Run abricate
+abricate --db [name of database] *.fasta > output.tab
+
+# Chnage the .tab file to .txt file
+mv output.tab output.txt
+
 ###Extract plasmid and chromosome from fasta file using MOB-suite
 # Input directory containing FASTA files
 input_dir="/mnt/storage7/woranich/klebsiella"
