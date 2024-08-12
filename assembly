@@ -27,7 +27,7 @@ done
 #!/bin/bash
 
 # Define the destination directory
-dest_dir="kp_asia_asm"
+dest_dir="/mnt/storage7/woranich/klebsiella/klebNCTC/kpasia_fasta"
 
 # Create the destination directory if it doesn't exist
 mkdir -p "$dest_dir"
