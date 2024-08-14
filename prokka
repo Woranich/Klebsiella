@@ -13,3 +13,20 @@ for fasta_file in "$INPUT_DIR"/*.fasta; do
     # Run Prokka with the appropriate parameters
     prokka --outdir "$OUTPUT_DIR/${base_name}" --prefix "$base_name" "$fasta_file"
 done
+
+##If you use the text file containing fasta file name
+#!/bin/bash
+
+# Path to the text file containing the list of FASTA files
+FILE_LIST="/path/to/your/file_list.txt"
+# Output directory where Prokka results will be stored
+OUTPUT_DIR="/path/to/output/directory"
+
+# Loop over each line in the file list
+while IFS= read -r fasta_file; do
+    # Extract the base name of the file (without path and extension)
+    base_name=$(basename "$fasta_file" .fasta)
+    # Run Prokka with the appropriate parameters
+    prokka --outdir "$OUTPUT_DIR/${base_name}" --prefix "$base_name" "$fasta_file"
+done < "$FILE_LIST"
+
