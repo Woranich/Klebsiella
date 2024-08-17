@@ -1,0 +1,11 @@
+##Move gff files from each prokka output directory to new directory
+#!/bin/bash
+
+# Target directory where .gff files will be copied
+target_directory="/mnt/storage7/woranich/klebsiella/kp_gff"
+
+# Create the target directory if it doesn't exist
+mkdir -p "$target_directory"
+
+# Find all .gff files in subdirectories and copy them to the target directory
+find . -type f -name "*.gff" -exec cp {} "$target_directory" \;
