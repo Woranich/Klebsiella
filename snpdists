@@ -1,0 +1,2 @@
+##Create snp distance matrix from aligned (filter_merged_vcf file and vcf2fasta) fasta file
+snp-dists kp.2024_08_16.genotyped.filtered_no_indels.snps.fa > kp_matrix.tsv
