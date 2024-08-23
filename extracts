@@ -1,0 +1,47 @@
+##Create or install centrifuge with mamba
+mamba create -n centrifuge centrifuge
+
+##Navigate to the environment and build the database from there
+##Building the centrifuge database for prokaryotes with centrifuge-download
+centrifuge-download -o taxonomy taxonomy
+centrifuge-download -o library -m -d "archaea,bacteria,viral" refseq > seqid2taxid.map
+
+##Build the index file
+cat library/*/*.fna > input-sequences.fna
+
+## build centrifuge index with 4 threads
+centrifuge-build -p 4 --conversion-table seqid2taxid.map \
+                 --taxonomy-tree taxonomy/nodes.dmp --name-table taxonomy/names.dmp \
+                 input-sequences.fna abv
+
+#!/bin/bash
+
+# Path to Centrifuge database
+DB_PATH=""
+
+# Output directory for the results
+OUTPUT_DIR="centrifuge_results"
+
+# Create the output directory if it doesn't exist
+mkdir -p $OUTPUT_DIR
+
+# Loop over all *_R1.fastq files in the directory
+for R1 in *_R1.fastq
+do
+    # Derive the corresponding R2 file
+    R2="${R1/_R1.fastq/_R2.fastq}"
+
+    # Extract the base name (e.g., "sample1" from "sample1_R1.fastq")
+    BASE_NAME=$(basename $R1 _R1.fastq)
+
+    # Define the output files
+    OUTPUT_RESULTS="$OUTPUT_DIR/${BASE_NAME}_centrifuge_results.txt"
+    OUTPUT_REPORT="$OUTPUT_DIR/${BASE_NAME}_centrifuge_report.tsv"
+
+    # Run Centrifuge
+    centrifuge -x $DB_PATH -1 $R1 -2 $R2 -S $OUTPUT_RESULTS --report-file $OUTPUT_REPORT
+
+    # Print a message after each sample is processed
+    echo "Centrifuge analysis completed for $BASE_NAME"
+
+done
