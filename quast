@@ -1,0 +1,2 @@
+##To check the assembly quality using quast
+quast -r kpMGH78578.fasta -o quast_results *.fasta
