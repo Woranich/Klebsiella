@@ -98,6 +98,58 @@ for fq1 in ./*_1.fastq.gz; do
   fi
 done
 
+##If need to be a fastq.gz use this one
+#!/bin/bash
+
+# Define the taxonomic ID for Klebsiella pneumoniae
+TAXID=573
+
+# Loop through all *_1.fastq.gz files
+for fq1 in ./*_1.fastq.gz; do
+  # Derive the corresponding *_2.fastq.gz file
+  fq2="${fq1/_1.fastq.gz/_2.fastq.gz}"
+
+  # Derive the corresponding Kraken2 output file and report file
+  kraken_file="${fq1/_1.fastq.gz/.kraken}"
+  report_file="${fq1/_1.fastq.gz/.kraken.report}"
+
+  # Check if corresponding files exist
+  if [[ -f "$fq2" && -f "$kraken_file" && -f "$report_file" ]]; then
+    # Extract the base name for output files
+    sample_name=$(basename "$fq1" _1.fastq.gz)
+
+    # Define the output prefixes
+    output_prefix_1="${sample_name}_klebsiella_1"
+    output_prefix_2="${sample_name}_klebsiella_2"
+
+    # Run extract_kraken_reads.py with -o and -o2 options
+    extract_kraken_reads.py \
+           -k "$kraken_file" \
+           -s1 "$fq1" \
+           -s2 "$fq2" \
+           -o "$output_prefix_1.fastq" \
+           -o2 "$output_prefix_2.fastq" \
+           -r "$report_file" \
+           --taxid $TAXID \
+           --include-children \
+           --fastq-output
+
+    # Check if the output files were generated
+    if [[ -f "${output_prefix_1}.fastq" && -f "${output_prefix_2}.fastq" ]]; then
+      # Compress the output files using gzip
+      gzip "${output_prefix_1}.fastq"
+      gzip "${output_prefix_2}.fastq"
+
+      echo "Successfully extracted and compressed Klebsiella pneumoniae reads for $sample_name."
+    else
+      echo "Error: Extraction failed for $sample_name."
+    fi
+
+  else
+    echo "Warning: Missing one or more corresponding files for $fq1. Skipping..."
+  fi
+done
+
 
 
 
