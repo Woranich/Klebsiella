@@ -46,9 +46,58 @@ for fq1 in ./*_1.fastq.gz; do
   fi
 done
 
-
-##Visualize the kraken output
+##Visualize the kraken output in html format
 ls *.kraken | while read -r line ; do rcf -n /mnt/storage7/woranich/retaxdump/taxdump -k $line ; done
+
+##Install krakentools
+conda install bioconda::krakentools
+
+##Extract the Klebsiella pneumoniae seqeunce using Krakentools
+#!/bin/bash
+
+# Define the taxonomic ID for Klebsiella pneumoniae
+TAXID=573
+
+# Loop through all *_1.fastq.gz files
+for fq1 in ./*_1.fastq.gz; do
+  # Derive the corresponding *_2.fastq.gz file
+  fq2="${fq1/_1.fastq.gz/_2.fastq.gz}"
+
+  # Derive the corresponding Kraken2 output file and report file
+  kraken_file="${fq1/_1.fastq.gz/.kraken}"
+  report_file="${fq1/_1.fastq.gz/.kraken.report}"
+
+  # Check if corresponding files exist
+  if [[ -f "$fq2" && -f "$kraken_file" && -f "$report_file" ]]; then
+    # Extract the base name for output files
+    sample_name=$(basename "$fq1" _1.fastq.gz)
+
+    # Define the output prefix
+    output_prefix="${sample_name}_klebsiella"
+
+    # Run extract_kraken_reads.py without specifying the full path
+    extract_kraken_reads.py \
+           -k "$kraken_file" \
+           -s1 "$fq1" \
+           -s2 "$fq2" \
+           -o "$output_prefix" \
+           -r "$report_file" \
+           --taxid $TAXID \
+           --include-children \
+           --fastq-output
+
+    # Check if the output files were generated
+    if [[ -f "${output_prefix}_1.fastq" && -f "${output_prefix}_2.fastq" ]]; then
+      echo "Successfully extracted Klebsiella pneumoniae reads for $sample_name."
+    else
+      echo "Error: Extraction failed for $sample_name."
+    fi
+
+  else
+    echo "Warning: Missing one or more corresponding files for $fq1. Skipping..."
+  fi
+done
+
 
 
 
