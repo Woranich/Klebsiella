@@ -1,20 +1,55 @@
-##Install Kraken2 client using
-mamba create -n kraken2 -c conda-forge -c epi2melabs kraken2-server ##or
-conda create -n kraken2 -c conda-forge -c epi2melabs kraken2-server
+##Install Kraken2 using
+mamba create -n kraken2 kraken2-server
 
-##Running the classifier from remote server
-conda activate kraken2
-kraken2_client --host-ip dan@10.18.0.25 --sequence <sequence file> --report <report output destination + filename > kraken_output.kraken
+#Building the kraken2 database
+kraken2-build --standard --threads 24 --db kraken2db
 
-##for running in loop
-ls *.fastq.gz | while read -r line ; do kraken2_client --host-ip dan@10.18.0.25 --sequence $line --report $line.report > $line.kraken ; done
+#Go to the directory that contain the fastq files and iterate over all *_1.fastq.gz files
+#!/bin/bash
 
-ls *_1.fastq.gz | while read -r line ; do
-  # Get the corresponding R2 file
-  pair=${line/_1.fastq.gz/_2.fastq.gz}
-  
-  # Run Kraken2 with both R1 and R2 files
-  kraken2_client --host-ip dan@10.18.0.25 \
-                 --sequence "$line" --sequence2 "$pair" \
-                 --report "$line.report" > "$line.kraken"
+# Define paths and parameters
+KRAKEN2_DB="/mnt/storage7/woranich/kraken2db"  # Path to your Kraken2 database
+THREADS=24  # Number of threads to use
+
+# Loop through all *_1.fastq.gz files
+for fq1 in ./*_1.fastq.gz; do
+  # Derive the corresponding *_2.fastq.gz file
+  fq2="${fq1/_1.fastq.gz/_2.fastq.gz}"
+
+  # Ensure the corresponding _2.fastq.gz file exists
+  if [[ -f "$fq2" ]]; then
+    # Extract the base name for output files
+    sample_name=$(basename "$fq1" _1.fastq.gz)
+
+    # Define the output file names
+    output_file="${sample_name}.kraken"
+    report_file="${sample_name}.kraken.report"
+
+    # Run Kraken2
+    kraken2 --db "$KRAKEN2_DB" \
+            --paired \
+            --threads "$THREADS" \
+            --output "$output_file" \
+            --use-names \
+            --report "$report_file" \
+            "$fq1" "$fq2"
+    
+    # Check if Kraken2 produced the expected output
+    if [[ ! -s "$output_file" ]]; then
+      echo "Error: Kraken2 failed to produce output for $sample_name."
+    else
+      echo "Kraken2 processing completed for $sample_name."
+    fi
+
+  else
+    echo "Warning: Corresponding pair file for $fq1 not found! Skipping..."
+  fi
 done
+
+
+##Visualize the kraken output
+ls *.kraken | while read -r line ; do rcf -n /mnt/storage7/woranich/retaxdump/taxdump -k $line ; done
+
+
+
+
