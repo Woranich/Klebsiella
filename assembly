@@ -27,7 +27,7 @@ done
 #!/bin/bash
 
 # Define the destination directory
-dest_dir="/mnt/storage7/woranich/klebsiella/klebNCTC/kpasia_fasta"
+dest_dir="/mnt/storage7/woranich/klebsiella/klebNCTC/kp_extract_samples_assembly"
 
 # Create the destination directory if it doesn't exist
 mkdir -p "$dest_dir"
@@ -56,7 +56,7 @@ echo "All scaffolds.fasta files have been copied to $dest_dir with appropriate p
 # Iterate through each file that matches the pattern
 for file in *_asm_scaffolds.fasta; do
     # Extract the base name (without _asm_scaffolds.fasta part)
-    base_name="${file%%_asm_scaffolds.fasta}"
+    base_name="${file%%_klebsiella_asm_scaffolds.fasta}"
 
     # Define the new file name
     new_file_name="${base_name}.fasta"
