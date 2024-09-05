@@ -1,0 +1,2 @@
+##Create tree from Roary output
+raxmlHPC -s core_gene_alignment.aln -n output_tree -m GTRGAMMA -p 12345
