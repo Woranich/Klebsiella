@@ -1,0 +1,126 @@
+## This is to create the network analysis and make putative transmission cluster 
+## First option with all isolates
+import pandas as pd
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Load the distance matrix
+distance_matrix_df = pd.read_csv('kp_matrix.tsv', sep='\t', index_col=0)
+distance_matrix = distance_matrix_df.to_numpy()
+
+# Load sample information from CSV (including country info)
+sample_info_df = pd.read_csv('kp_country.csv')  # Ensure this file has SampleName and Country columns
+
+# Set threshold for clustering (adjust based on your data)
+threshold = 10  # Example threshold for SNP distance
+
+# Create an undirected graph
+G = nx.Graph()
+
+# Map to store country colors
+country_colors = {
+    'Pakistan': 'red',
+    'Bangladesh': 'blue',
+    'Thailand': 'green',
+    'Vietnam': 'purple',
+    'Myanmar': 'orange',
+    'Philippines': 'pink',
+    'Singapore': 'brown',
+    'India': 'cyan'
+}
+
+# Add nodes and edges based on the distance threshold
+for sample in distance_matrix_df.index:
+    G.add_node(sample, country=sample_info_df.loc[sample_info_df['Sample'] == sample, 'Country'].values[0])
+
+# Add edges based on distance threshold
+for i in range(len(distance_matrix)):
+    for j in range(i + 1, len(distance_matrix)):
+        if distance_matrix[i, j] <= threshold:
+            G.add_edge(distance_matrix_df.index[i], distance_matrix_df.index[j], weight=distance_matrix[i, j])
+
+# Prepare node colors based on country
+node_colors = []
+for node in G.nodes():
+    country = G.nodes[node]['country']
+    node_colors.append(country_colors.get(country, 'gray'))  # Default to gray for unknown countries
+
+# Draw the network
+plt.figure(figsize=(12, 12))
+pos = nx.spring_layout(G)  # Layout for visualization
+nx.draw_networkx_nodes(G, pos, node_size=500, node_color=node_colors)
+nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
+nx.draw_networkx_labels(G, pos, font_size=10)
+plt.title('Transmission Network of Isolates with Country Information')
+plt.axis('off')  # Turn off the axis
+plt.savefig('network_snp10_all.png', dpi=300, bbox_inches='tight')
+
+plt.show()
+
+#Second option discard the isolated node with no connections
+import pandas as pd
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+
+# Load the distance matrix
+distance_matrix_df = pd.read_csv('kp_matrix.tsv', sep='\t', index_col=0)
+distance_matrix = distance_matrix_df.to_numpy()
+
+# Load sample information from CSV (including country info)
+sample_info_df = pd.read_csv('sample_info.csv')
+
+# Set threshold for clustering
+threshold = 10  # Example threshold for SNP distance
+
+# Create an undirected graph
+G = nx.Graph()
+
+# Map to store country colors
+country_colors = {
+    'Pakistan': 'red',
+    'Bangladesh': 'blue',
+    'Thailand': 'green',
+    'Vietnam': 'purple',
+    'Myanmar': 'orange',
+    'Philippines': 'pink',
+    'Singapore': 'brown',
+    'India': 'cyan'
+}
+
+# Add nodes and edges based on the distance threshold
+for sample in distance_matrix_df.index:
+    G.add_node(sample, country=sample_info_df.loc[sample_info_df['SampleName'] == sample, 'Country'].values[0])
+
+# Add edges based on distance threshold
+for i in range(len(distance_matrix)):
+    for j in range(i + 1, len(distance_matrix)):
+        if distance_matrix[i, j] <= threshold:
+            G.add_edge(distance_matrix_df.index[i], distance_matrix_df.index[j], weight=distance_matrix[i, j])
+
+# Remove nodes with degree 0 (isolated nodes)
+isolated_nodes = [node for node in G.nodes() if G.degree(node) == 0]
+G.remove_nodes_from(isolated_nodes)
+
+# Prepare node colors based on country
+node_colors = []
+for node in G.nodes():
+    country = G.nodes[node]['country']
+    node_colors.append(country_colors.get(country, 'gray'))  # Default to gray for unknown countries
+
+# Draw the network
+plt.figure(figsize=(12, 12))
+pos = nx.spring_layout(G)  # Layout for visualization
+nx.draw_networkx_nodes(G, pos, node_size=500, node_color=node_colors)
+nx.draw_networkx_edges(G, pos, width=1.0, alpha=0.5)
+nx.draw_networkx_labels(G, pos, font_size=10)
+plt.title('Transmission Network of Isolates with Country Information (Excluding Isolated Nodes)')
+plt.axis('off')  # Turn off the axis
+
+# Create a custom legend
+handles = [plt.Line2D([0], [0], marker='o', color='w', label=country, 
+                       markerfacecolor=color, markersize=10) for country, color in country_colors.items()]
+plt.legend(handles=handles, title='Country')
+
+plt.show()
