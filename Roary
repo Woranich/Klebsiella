@@ -1,3 +1,8 @@
+# Intall Roary
+conda create -n roary_env perl=5.22.0
+conda activate roary_env
+conda install -c bioconda roary
+
 ##Move gff files from each prokka output directory to new directory
 #!/bin/bash
 
