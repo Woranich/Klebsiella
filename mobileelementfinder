@@ -21,3 +21,32 @@ for file in *.fasta; do
 done
 
 echo "All files have been processed."
+
+##To extract the results of mge
+
+#!/bin/bash
+
+# Output file for the summary
+output_file="mge_summary.csv"
+
+# Clear the output file if it exists
+> "$output_file"
+
+# Loop through each CSV file in the current directory
+for file in *.csv; do
+    # Extract plasmid ID from the filename
+    plasmid_id=$(basename "$file" | sed -E 's/.*_(.*)\.csv/\1/')
+
+    # Print header for the summary file
+    echo "Plasmid ID, MGE Name, Identity, Coverage" >> "$output_file"
+
+    # Read the CSV file and extract relevant columns
+    while IFS=, read -r mge_no name synonyms prediction type allele_len depth e_value identity coverage gaps substitution contig start end cigar; do
+        # Skip the header row
+        if [[ "$name" != "name" ]]; then
+            echo "$plasmid_id, $name, $identity, $coverage" >> "$output_file"
+        fi
+    done < "$file"
+done
+
+echo "Summary of MGEs has been written to $output_file."
