@@ -13,3 +13,47 @@ for fasta_file in $input_dir/*.fasta; do
     # Run mob_recon command
     mob_recon --infile "$fasta_file" --outdir "$output_dir"
 done
+
+# Create the code to move and rename the output to the new directory
+# Create py file
+nano moveplasmid.py
+
+##### Add this script #######
+
+import os
+import shutil
+
+# Set the directory containing the mobsuite output directories
+base_directory = '/mnt/storage7/woranich/klebsiella/klebNCTC/kpasia_fasta/monsuite_output'
+# Set the destination directory where the renamed files will be stored
+destination_directory = '/mnt/storage7/woranich/klebsiella/klebNCTC/kpasia_fasta/kpasia_plasmid'
+
+# Ensure the destination directory exists
+if not os.path.exists(destination_directory):
+    os.makedirs(destination_directory)
+
+# Loop through each subdirectory in the base directory
+for subdir in os.listdir(base_directory):
+    subdir_path = os.path.join(base_directory, subdir)
+    
+    if os.path.isdir(subdir_path):  # Only process directories
+        # Loop through files in the current subdirectory
+        for filename in os.listdir(subdir_path):
+            if filename.startswith("plasmid_") and filename.endswith(".fasta"):
+                # Construct full file path
+                file_path = os.path.join(subdir_path, filename)
+                
+                # Create new filename by prefixing the directory name
+                new_filename = f"{subdir}_{filename}"
+                
+                # Destination file path
+                destination_file_path = os.path.join(destination_directory, new_filename)
+                
+                # Copy and rename the file
+                shutil.copy(file_path, destination_file_path)
+                print(f"Copied and renamed: {file_path} to {destination_file_path}")
+
+print("All files have been successfully copied and renamed.")
+###########
+# Run the script
+python moveplasmid.py
