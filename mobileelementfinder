@@ -24,29 +24,66 @@ echo "All files have been processed."
 
 ##To extract the results of mge
 
-#!/bin/bash
+# Create the new mamba environment for python
+mamba create -n python python
 
-# Output file for the summary
-output_file="mge_summary.csv"
+# Create new py script 
+nano extractmge.py
 
-# Clear the output file if it exists
-> "$output_file"
+# Add the following script
+##################
+import os
+import pandas as pd
 
-# Loop through each CSV file in the current directory
-for file in *.csv; do
-    # Extract plasmid ID from the filename
-    plasmid_id=$(basename "$file" | sed -E 's/.*_(.*)\.csv/\1/')
+# Directory containing the CSV files (this can be current working directory)
+input_directory = os.getcwd()  # This will take the current working directory
+output_file = 'extracted_mge_info.csv'  # Output file in the same directory
 
-    # Print header for the summary file
-    echo "Plasmid ID, MGE Name, Identity, Coverage" >> "$output_file"
+# List to store the extracted data
+extracted_data = []
 
-    # Read the CSV file and extract relevant columns
-    while IFS=, read -r mge_no name synonyms prediction type allele_len depth e_value identity coverage gaps substitution contig start end cigar; do
-        # Skip the header row
-        if [[ "$name" != "name" ]]; then
-            echo "$plasmid_id, $name, $identity, $coverage" >> "$output_file"
-        fi
-    done < "$file"
-done
+# Function to split sample name and plasmid name
+def extract_sample_and_plasmid(sample_full_name):
+    sample_parts = sample_full_name.split('_')
+    sample_name = sample_parts[0]  # First part (e.g., "Kb-103")
+    plasmid_name = sample_parts[-1]  # Last part (e.g., "AA458")
+    return sample_name, plasmid_name
 
-echo "Summary of MGEs has been written to $output_file."
+# Loop through each CSV file in the directory
+for filename in os.listdir(input_directory):
+    if filename.endswith('.csv'):
+        file_path = os.path.join(input_directory, filename)
+        
+        # Extract the full sample name from the CSV file header
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                if line.startswith('#sample:'):
+                    sample_full_name = line.split(":")[1].strip()  # Extract full sample name (e.g., "Kb-103_plasmid_AA458")
+        
+        # Split into sample name and plasmid name
+        sample_name, plasmid_name = extract_sample_and_plasmid(sample_full_name)
+        
+        # Read the CSV file content starting from the correct row (after the headers)
+        df = pd.read_csv(file_path, comment='#')  # Skip comment lines starting with '#'
+
+        # Extract the 'name' and 'type' columns
+        extracted_info = df[['name', 'type']].copy()
+        extracted_info['sample_name'] = sample_name  # Add sample name as a new column
+        extracted_info['plasmid_name'] = plasmid_name  # Add plasmid name as a new column
+
+        # Append to the list
+        extracted_data.append(extracted_info)
+
+# Concatenate all the data into a single DataFrame
+final_df = pd.concat(extracted_data)
+
+# Save the extracted data to a new CSV file
+final_df.to_csv(output_file, index=False)
+
+print(f"Data extracted and saved to {output_file}")
+
+#############
+
+# Run the script from the directory containing the mge output files
+python extractmge.py
