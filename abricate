@@ -4,5 +4,17 @@
 # Run abricate
 abricate --db [name of database] *.fasta > output.tab
 
+## Database list
+DATABASE       SEQUENCES  DBTYPE  DATE
+argannot       1749       nucl    2019-Jul-28
+card           2241       nucl    2019-Jul-28
+ecoh           597        nucl    2019-Jul-28
+ecoli_vf       2701       nucl    2019-Jul-28
+megares        6635       nucl    2020-Feb-20
+ncbi           4324       nucl    2019-Jul-28
+plasmidfinder  263        nucl    2019-Jul-28
+resfinder      2434       nucl    2019-Jul-28
+vfdb           2597       nucl    2019-Jul-28
+
 # Chnage the .tab file to .txt file
 mv output.tab output.txt
