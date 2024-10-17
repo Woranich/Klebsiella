@@ -1,0 +1,47 @@
+# Use output from roary for input
+# Create core genome reference
+# Determine the highest core genome coverage of the sample
+from Bio import SeqIO
+
+aln_file = "core_gene_alignment.aln"
+coverage_counts = {}
+
+# Read each sequence in the alignment file
+for record in SeqIO.parse(aln_file, "fasta"):
+    # Count non-gap characters (i.e., A, T, C, G)
+    non_gap_count = sum(1 for base in record.seq if base != "-")
+    coverage_counts[record.id] = non_gap_count
+
+# Find the sample with the highest non-gap count
+max_coverage_sample = max(coverage_counts, key=coverage_counts.get)
+print(f"Sample with highest coverage: {max_coverage_sample} ({coverage_counts[max_coverage_sample]} non-gap bases)")
+
+# Use the highest coverage sample as the representative
+grep -A 1 "DRR121815" core_gene_alignment.aln > core_genome_reference.fasta
+
+# Create the nogap core genome reference
+sed 's/-//g' core_genome_reference.fasta > core_genome_reference_nogaps.fasta
+
+# Mapping Paired-end reads to the core genome reference
+bwa index core_genome_reference_nogaps.fasta
+
+# Indicate the reference
+REFERENCE="core_genome_reference_nogaps.fasta"
+
+# for 1 pair or files
+bwa mem "$REFERENCE" Kb-103_1.fastq.gz Kb-103_2.fastq.gz > test_mapped.sam
+
+# Loop through each paired-end file
+for R1 in *_1.fastq.gz; do
+    # Set the R2 file based on the R1 filename
+    R2="${R1/_1.fastq.gz/_2.fastq.gz}"
+
+    # Extract the sample name for output
+    SAMPLE_NAME=$(basename "$R1" _1.fastq.gz)
+
+    # Run bwa mem and save output as BAM files
+    bwa mem "$REFERENCE" "$R1" "$R2" | samtools view -Sb - | samtools sort -o "${SAMPLE_NAME}_mapped_sorted.bam"
+    
+    echo "Processed $SAMPLE_NAME"
+done
+
