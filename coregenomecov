@@ -72,6 +72,15 @@ for gff_file in *_core_genome_annotations.gff; do
     bedtools intersect -a "$gff_file" -b "$gff_file" > "${sample_name}_core_genome.bed"
 done
 
-# do the bedtools coverage
+# do the bedtools coverage using parallel (not recommended, take up too much server space)
 ls *_core_genome.bed | parallel 'sample_name=$(basename {} _core_genome.bed); bedtools coverage -a {} -b ${sample_name}_mapped_sorted.bam > ${sample_name}_gene_coverage.txt'
+
+# Using the loop 
+for bed_file in *_core_genome.bed; do
+    # Extract the sample name (basename without the .bed extension)
+    sample_name=$(basename "$bed_file" _core_genome.bed)
+
+    # Run bedtools coverage for the corresponding BAM file
+    bedtools coverage -a "$bed_file" -b "${sample_name}_mapped_sorted.bam" > "${sample_name}_gene_coverage.txt"
+done
 
