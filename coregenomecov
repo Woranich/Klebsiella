@@ -45,3 +45,7 @@ for R1 in *_1.fastq.gz; do
     echo "Processed $SAMPLE_NAME"
 done
 
+# Calculate coverage across core genes
+samtools depth -a mapped_reads_sorted.bam > coverage.txt
+
+
