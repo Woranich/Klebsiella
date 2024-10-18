@@ -49,4 +49,29 @@ done
 ls *_mapped_sorted.bam | parallel -j 8 'samtools index {}'
 ls *_mapped_sorted.bam | parallel -j 8 'samtools depth {} > {.}_coverage.txt'
 
+# Create core genes list
+import pandas as pd
+
+# Load gene presence/absence data from Roary
+gene_pa_df = pd.read_csv('gene_presence_absence.csv')
+
+# Filter core genes (those present in 100% of the genomes or your chosen threshold)
+core_genes = gene_pa_df[gene_pa_df['No. isolates'] == gene_pa_df['No. isolates'].max()]
+
+# Save the list of core gene names
+core_genes_list = core_genes['Gene'].tolist()
+
+# Write the core gene names to a text file
+with open('core_genes_list.txt', 'w') as f:
+    for gene in core_genes_list:
+        f.write(f"{gene}\n")
+
+# Convert gff to bed using bedtools
+for gff_file in *_core_genome_annotations.gff; do
+    sample_name=$(basename "$gff_file" _core_genome_annotations.gff)
+    bedtools intersect -a "$gff_file" -b "$gff_file" > "${sample_name}_core_genome.bed"
+done
+
+# do the bedtools coverage
+ls *_core_genome.bed | parallel 'sample_name=$(basename {} _core_genome.bed); bedtools coverage -a {} -b ${sample_name}_mapped_sorted.bam > ${sample_name}_gene_coverage.txt'
 
