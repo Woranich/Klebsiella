@@ -46,6 +46,7 @@ for R1 in *_1.fastq.gz; do
 done
 
 # Calculate coverage across core genes
-samtools depth -a mapped_reads_sorted.bam > coverage.txt
+ls *_mapped_sorted.bam | parallel -j 8 'samtools index {}'
+ls *_mapped_sorted.bam | parallel -j 8 'samtools depth {} > {.}_coverage.txt'
 
 
