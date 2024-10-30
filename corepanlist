@@ -1,0 +1,83 @@
+# Extract core and pan genes set
+import pandas as pd
+
+def extract_core_and_pan_genes_rtab(gene_presence_absence_rtab_file):
+    # Load the Rtab file into a DataFrame
+    df = pd.read_csv(gene_presence_absence_rtab_file, sep='\t')
+
+    # Extract gene names (first column)
+    genes = df.iloc[:, 0]
+
+    # Extract the presence/absence data (all columns after the first one)
+    gene_data = df.iloc[:, 1:]
+
+    # Ensure the presence/absence data is numeric (this should already be the case, but it's good practice)
+    gene_data = gene_data.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+    # Core genes: present in all genomes (sum equals the number of genomes)
+    core_genes = genes[gene_data.sum(axis=1) == gene_data.shape[1]]
+
+    # Pan genes: present in at least one genome
+    pan_genes = genes[gene_data.sum(axis=1) > 0]
+
+    return set(core_genes), set(pan_genes)
+
+# Example usage for each country's files
+pk_core, pk_pan = extract_core_and_pan_genes_rtab("kppk_gene_presence_absence.Rtab")
+bd_core, bd_pan = extract_core_and_pan_genes_rtab("kpbd_gene_presence_absence.Rtab")
+id_core, id_pan = extract_core_and_pan_genes_rtab("kpid_gene_presence_absence.Rtab")
+mm_core, mm_pan = extract_core_and_pan_genes_rtab("kpmm_gene_presence_absence.Rtab")
+pl_core, pl_pan = extract_core_and_pan_genes_rtab("kppl_gene_presence_absence.Rtab")
+sp_core, sp_pan = extract_core_and_pan_genes_rtab("kpsp_gene_presence_absence.Rtab")
+th_core, th_pan = extract_core_and_pan_genes_rtab("kpth_gene_presence_absence.Rtab")
+vn_core, vn_pan = extract_core_and_pan_genes_rtab("kpvn_gene_presence_absence.Rtab")
+
+# Example sets for core and pan genes for each country (replace with your actual data)
+core_genes = {
+    "MM": mm_core,  # Core genes for MM
+    "PL": pl_core,  # Core genes for PL
+    "SP": sp_core,  # Core genes for SP
+    "TH": th_core,  # Core genes for TH
+    "VN": vn_core,  # Core genes for VN
+    "PK": pk_core,  # Core genes for PK
+    "BD": bd_core,  # Core genes for BD
+    "ID": id_core   # Core genes for ID
+}
+
+pan_genes = {
+    "MM": mm_pan,   # Pan genes for MM
+    "PL": pl_pan,   # Pan genes for PL
+    "SP": sp_pan,   # Pan genes for SP
+    "TH": th_pan,   # Pan genes for TH
+    "VN": vn_pan,   # Pan genes for VN
+    "PK": pk_pan,   # Pan genes for PK
+    "BD": bd_pan,   # Pan genes for BD
+    "ID": id_pan    # Pan genes for ID
+}
+
+# Calculate the common core genes (intersection across all countries)
+common_core_genes = set.intersection(*core_genes.values())
+print(f"Common core genes across all countries: {len(common_core_genes)}")
+
+# Calculate the common pan genes (union across all countries)
+common_pan_genes = set.union(*pan_genes.values())
+print(f"Common pan genes across all countries: {len(common_pan_genes)}")
+  
+# Convert the set of common pan genes to a DataFrame
+common_pan_genes_df = pd.DataFrame(common_pan_genes, columns=['Gene'])
+
+# Save to CSV
+common_pan_genes_df.to_csv("common_pan_genes.csv", index=False)
+
+# Prepare the gene list into plain txt
+tail -n +2 common_core_genes.csv > common_core_genes.txt #Change to pan gene set if needed
+
+# Run grep to create the annontation file
+for gff_file in *.gff; do
+    # Extract the sample name from the GFF file
+    sample_name=$(basename "$gff_file" .gff)
+    
+    # Use grep to filter genes in the GFF file based on the gene list
+    grep -Ff common_core_genes.txt "$gff_file" > "${sample_name}_core_genome_annotations.gff" #change to pan genome if needed
+done
+
