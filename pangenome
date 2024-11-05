@@ -1,0 +1,31 @@
+import pandas as pd
+import glob
+import re
+
+# Directory containing Roary GFF files
+gff_files = glob.glob('./*.gff')
+
+# List to hold extracted gene data
+genes_data = []
+
+for file in gff_files:
+    with open(file, 'r') as f:
+        for line in f:
+            if not line.startswith('#') and '\tgene\t' in line:
+                parts = line.strip().split('\t')
+                attributes = parts[-1]
+                
+                # Extract gene name
+                gene_match = re.search('ID=([^;]+)', attributes)
+                gene_name = gene_match.group(1) if gene_match else 'Unknown'
+                
+                # Extract gene function (if available)
+                function_match = re.search('product=([^;]+)', attributes)
+                gene_function = function_match.group(1) if function_match else 'Unknown'
+                
+                # Append to list
+                genes_data.append([gene_name, gene_function])
+
+# Convert to DataFrame and save
+genes_df = pd.DataFrame(genes_data, columns=['Gene', 'Function'])
+genes_df.to_csv('pan_genome_genes_functions.csv', index=False)
