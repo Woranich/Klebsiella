@@ -11,7 +11,7 @@ for fasta_file in $input_dir/*.fasta; do
     # Indicate the name list for output directory
     output_dir="$filename_no_ext"
     # Run mob_recon command
-    mob_recon --infile "$fasta_file" --outdir "$output_dir"
+    mob_recon -o "$output_dir" -i "$fasta_file"
 done
 
 # Create the code to move and rename the output to the new directory
