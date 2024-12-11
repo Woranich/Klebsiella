@@ -4,12 +4,13 @@ mamba create -n kraken2 kraken2-server
 #Building the kraken2 database
 kraken2-build --standard --threads 24 --db kraken2db
 
+##Use kraken2 to check the contamination of the fastq files
 #Go to the directory that contain the fastq files and iterate over all *_1.fastq.gz files
 #!/bin/bash
 
 # Define paths and parameters
 KRAKEN2_DB="/mnt/storage7/woranich/kraken2db"  # Path to your Kraken2 database
-THREADS=24  # Number of threads to use
+THREADS=8  # Number of threads to use
 
 # Loop through all *_1.fastq.gz files
 for fq1 in ./*_1.fastq.gz; do
@@ -46,7 +47,8 @@ for fq1 in ./*_1.fastq.gz; do
   fi
 done
 
-##Visualize the kraken output in html format
+##Visualize the kraken output in html format using recentrifuge
+mamba activate recentrifuge
 ls *.kraken | while read -r line ; do rcf -n /mnt/storage7/woranich/retaxdump/taxdump -k $line ; done
 
 ##Install krakentools
