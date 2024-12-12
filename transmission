@@ -1,0 +1,6 @@
+# Convert the fasta file into tsv file
+snp-dists kp.2024_09_03.genotyped.filtered_no_indels.snps.fa > kp_snp_dists.tsv
+
+# create the transmission network
+input file = kp_snp_dists.tsv
+python snp-dists2json.py --input kp_snp_dists.tsv --output transmission_network.json --cutoff 10
