@@ -19,7 +19,7 @@ do
     sample_output="${OUTPUT_DIR}/${base}_asm"
 
     # Run spades.py
-    spades.py -1 "$file1" -2 "$file2" -o "$sample_output"
+    spades.py -1 "$file1" -2 "$file2" -o 733_S19_asm
 done
 
 ###Store assemblies in the new directory###
@@ -27,7 +27,7 @@ done
 #!/bin/bash
 
 # Define the destination directory
-dest_dir="/mnt/storage7/woranich/klebsiella/klebNCTC/kp_extract_samples_assembly"
+dest_dir="/mnt/storage7/woranich/dms_ecoli/assembly"
 
 # Create the destination directory if it doesn't exist
 mkdir -p "$dest_dir"
