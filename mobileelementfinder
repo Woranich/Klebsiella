@@ -8,8 +8,9 @@ mefinder find -c ./WMW942_plasmid_AD443.fasta WMW942_plasmid_AD443 --blastn-path
 #!/bin/bash
 
 # Check if the output directory exists, if not, create it
-OUTPUT_DIR="kp_asia_mge"
+OUTPUT_DIR="dms_ecoli_mge"
 mkdir -p "$OUTPUT_DIR"
+BLASTN_PATH=/mnt/storage7/woranich/ncbi-blast-2.16.0+/bin/blastn
 
 # Loop through each .fasta file in the current directory
 for file in *.fasta; do
