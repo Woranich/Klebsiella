@@ -1,0 +1,58 @@
+import csv
+
+def read_snp_distance_matrix(file_path):
+    snp_distance_matrix = {}
+    with open(file_path, "r") as snp_file:
+        snp_reader = csv.reader(snp_file, delimiter="\t")
+        header = next(snp_reader)  # Skip header
+        for row in snp_reader:
+            source = row[0]
+            snp_distance_matrix[source] = {}
+            for idx, target in enumerate(header[1:], 1):
+                snp_distance_matrix[source][target] = float(row[idx])
+    return snp_distance_matrix
+
+def read_geographic_distance_matrix(file_path):
+    geographic_distance_matrix = {}
+    with open(file_path, "r") as geo_file:
+        geo_reader = csv.reader(geo_file)
+        header = next(geo_reader)  # Skip header
+        for row in geo_reader:
+            source = row[0]
+            geographic_distance_matrix[source] = {}
+            for idx, target in enumerate(header[1:], 1):
+                geographic_distance_matrix[source][target] = float(row[idx])
+    return geographic_distance_matrix
+
+def save_comparison_results(results, output_file):
+    with open(output_file, "w", newline="") as result_file:
+        writer = csv.writer(result_file)
+        writer.writerow(["Source", "Target", "Genetic Distance", "Geographic Distance"])
+        for result in results:
+            writer.writerow(result)
+
+def main():
+    # Specify the file paths directly
+    snp_file_path = "../01_Fastq2/snp_dists_lineage4.tsv"
+    geo_file_path = "../01_Fastq2/lineage4_distance_matrix.csv"
+    output_file = "../05_Python_notebook/Cluster/lineage4_snp-geo.csv"
+
+    snp_distance_matrix = read_snp_distance_matrix(snp_file_path)
+    geographic_distance_matrix = read_geographic_distance_matrix(geo_file_path)
+    
+    pairs = []
+    for source in snp_distance_matrix.keys():
+        for target in snp_distance_matrix[source].keys():
+            pairs.append((source, target))
+
+    results = []
+    for source, target in pairs:
+        genetic_distance = snp_distance_matrix[source][target]
+        geographic_distance = geographic_distance_matrix[source][target]
+        results.append([source, target, genetic_distance, geographic_distance])
+
+    save_comparison_results(results, output_file)
+    print(f"Results saved in {output_file}")
+
+# Call the main function
+main()
