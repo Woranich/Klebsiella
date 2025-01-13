@@ -1,0 +1,53 @@
+nano snp-dists2json.py
+
+# Add this code
+
+import json
+import csv
+import argparse
+
+parser = argparse.ArgumentParser(description='Convert snp-dists output to json')
+parser.add_argument('--input', help='snp-dists output file',required = True)
+parser.add_argument('--output', help='json output file',required = True)
+parser.add_argument('--cutoff', help='distance cutoff',required = True,type=int)
+args = parser.parse_args()
+
+
+IN = open(args.input, 'r')
+tmpedges = []
+for i,line in enumerate(IN):
+    row = line.strip().split('\t')
+    if "snp-dists" in row[0]:
+        header = line.strip().split('\t')
+        continue
+    for j in range(1,len(row)):
+        if j>=i:
+            continue
+        dist = int(row[j])
+        if dist<args.cutoff:
+            tmpedges.append([header[i],header[j],dist])
+
+
+edges = []
+nodes = []
+
+for n in header[1:]:
+    nodes.append({"id":n,"properties":{}})
+
+for edge in tmpedges:
+    edges.append({
+        "source":edge[0],
+        "target":edge[1],
+        "properties":{
+            "distance":edge[2]
+        }
+    })
+
+json.dump({"nodes":nodes,"edges":edges},open(args.output,'w'),indent=4)
+
+
+# ['snp-dists 0.8.2', 'DS-13451', 'DS-15117', 'DS-15154', 'DS-15450', 'DS-16221', 'DS-17105', 'DS-20227', 'DS-21277', 'DS-5538']
+# ['DS-13451', '0', '8', '3', '7', '2', '10', '31', '28', '2']
+# ['DS-15117', '8', '0', '6', '10', '6', '4', '35', '31', '6']
+# ['DS-15154', '3', '6', '0', '6', '1', '8', '29', '24', '1']
+# ['DS-15450', '7', '10', '6', '0', '5', '13', '34', '26', '5']
