@@ -51,3 +51,5 @@ json.dump({"nodes":nodes,"edges":edges},open(args.output,'w'),indent=4)
 # ['DS-15117', '8', '0', '6', '10', '6', '4', '35', '31', '6']
 # ['DS-15154', '3', '6', '0', '6', '1', '8', '29', '24', '1']
 # ['DS-15450', '7', '10', '6', '0', '5', '13', '34', '26', '5']
+
+## Usage python snp-dists2json.py --input file_name.txt --output file_name.json --cutoff 10
