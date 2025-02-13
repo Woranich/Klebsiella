@@ -1,0 +1,5 @@
+# Using fastqc to check the quality of the raw fastq files
+fastqc -o name_of_output_directory *.fq.gz
+
+# Create the summary report of the fastqc output
+multiqc . 
