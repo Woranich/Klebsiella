@@ -3,3 +3,33 @@ fastqc -o name_of_output_directory *.fq.gz
 
 # Create the summary report of the fastqc output
 multiqc . 
+
+# Trim the illumina adapter
+#!/bin/bash
+
+# Define the path to the adapter file
+ADAPTERS=TruSeq3-PE.fa  # Update with the correct path
+THREADS=4  # Adjust based on CPU cores
+
+# Create an output directory
+mkdir -p trimmed_reads
+
+# Loop through all paired-end FASTQ files
+for file in *_1.fastq.gz; do
+    # Extract the sample name (removes '_1.fastq.gz')
+    base=$(basename "$file" _1.fastq.gz)
+
+    echo "Processing sample: $base"
+
+    # Run Trimmomatic
+    trimmomatic PE -threads $THREADS -phred33 \
+        "${base}_1.fastq.gz" "${base}_2.fastq.gz" \
+        "trimmed_reads/${base}_1P.fastq.gz" "trimmed_reads/${base}_1U.fastq.gz" \
+        "trimmed_reads/${base}_2P.fastq.gz" "trimmed_reads/${base}_2U.fastq.gz" \
+        ILLUMINACLIP:$ADAPTERS:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:20 MINLEN:36
+
+    echo "Finished processing $base"
+done
+
+echo "All samples have been processed!"
+
