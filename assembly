@@ -23,6 +23,7 @@ do
 done
 
 ###Store assemblies in the new directory###
+# Navigate to the directory containing the subdirectories for each sample
 
 #!/bin/bash
 
@@ -33,21 +34,29 @@ dest_dir="/mnt/storage7/woranich/acinetobacter/ab_assembly"
 mkdir -p "$dest_dir"
 
 # Iterate through each subdirectory
-for dir in */; do
-    # Check if the directory contains a scaffolds.fasta file
-    if [ -f "$dir/scaffolds.fasta" ]; then
-        # Get the base name of the directory
-        base_name=$(basename "$dir")
+for dir in *; do
+    # Check if it's a directory
+    if [ -d "$dir" ]; then
+        # Check if the directory contains a scaffolds.fasta file
+        if [ -f "$dir/scaffolds.fasta" ]; then
+            # Get the base name of the directory (already correct)
+            base_name=$(basename "$dir")
 
-        # Define the new file name with the directory name as prefix
-        new_file_name="${base_name}_scaffolds.fasta"
+            # Define the new file name with the directory name as prefix
+            new_file_name="${base_name}_scaffolds.fasta"
 
-        # Copy the file to the destination directory with the new name
-        cp "$dir/scaffolds.fasta" "$dest_dir/$new_file_name"
+            # Copy the file to the destination directory with the new name
+            cp "$dir/scaffolds.fasta" "$dest_dir/$new_file_name"
+
+            echo "Copied $dir/scaffolds.fasta to $dest_dir/$new_file_name"
+        else
+            echo "Warning: No scaffolds.fasta found in $dir"
+        fi
     fi
 done
 
 echo "All scaffolds.fasta files have been copied to $dest_dir with appropriate prefixes."
+
 
 ###rename assembly files###
 
