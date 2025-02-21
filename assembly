@@ -1,25 +1,25 @@
 #!/bin/bash
 
 # Define the output directory
-OUTPUT_DIR=kp_asia_assembly
+OUTPUT_DIR=ab_asia_assembly
 
 # Create the output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"
 
-# Loop through all _1.fastq.gz files in the current directory
-for file1 in *_1.fastq.gz
+# Loop through all _1P.fastq.gz files in the current directory
+for file1 in *_1P.fastq.gz
 do
     # Derive the base name of the file (remove suffix)
-    base=$(basename "$file1" _1.fastq.gz)
+    base=$(basename "$file1" _1P.fastq.gz)
 
-    # Define the corresponding _2.fastq.gz file
-    file2="${base}_2.fastq.gz"
+    # Define the corresponding _2P.fastq.gz file
+    file2="${base}_2P.fastq.gz"
 
     # Define the output directory for this pair
     sample_output="${OUTPUT_DIR}/${base}_asm"
 
     # Run spades.py
-    spades.py -1 "$file1" -2 "$file2" -o 733_S19_asm
+    spades.py -1 "$file1" -2 "$file2" -o "$sample_output"
 done
 
 ###Store assemblies in the new directory###
@@ -27,7 +27,7 @@ done
 #!/bin/bash
 
 # Define the destination directory
-dest_dir="/mnt/storage7/woranich/dms_ecoli/assembly"
+dest_dir="/mnt/storage7/woranich/acinetobacter/ab_assembly"
 
 # Create the destination directory if it doesn't exist
 mkdir -p "$dest_dir"
