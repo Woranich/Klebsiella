@@ -1,5 +1,5 @@
 # Using fastqc to check the quality of the raw fastq files
-fastqc -o name_of_output_directory *.fq.gz
+fastqc -o nextera_trim_fastqc *.fastq.gz
 
 # Create the summary report of the fastqc output
 multiqc . 
@@ -32,4 +32,27 @@ for file in *_1.fastq.gz; do
 done
 
 echo "All samples have been processed!"
+
+# Use cutadapt for poly tail
+
+#!/bin/bash
+
+mkdir -p final_clean_reads  # Create an output directory
+
+for file in *_1P.fastq.gz; do
+    base=$(basename "$file" _1P.fastq.gz)
+    echo "Processing $base"
+
+    # Run cutadapt to remove poly(A) and poly(G) tails
+    cutadapt -a "A{20}" -a "G{20}" -A "A{20}" -A "G{20}" \
+        -o "final_clean_reads/${base}_1P_final.fastq.gz" \
+        -p "final_clean_reads/${base}_2P_final.fastq.gz" \
+        "./${base}_1P.fastq.gz" "./${base}_2P.fastq.gz"
+
+    echo "Finished processing $base"
+done
+
+echo "All samples processed!"
+
+
 
