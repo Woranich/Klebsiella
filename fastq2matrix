@@ -1,0 +1,28 @@
+
+##After finish the run do the mergevcf to create the merge vcf file 
+##Create the new txt file containing all vcf files’ name
+
+ls *.vcf.gz > vcf.txt
+
+##Remove the file extension
+sed 's/\.g\.vcf\.gz//g' vcf.txt > basedname_vcf.txt
+
+##Create the data base to preparing to merge the vcf files
+##Note run this code from the directory that contains all the vcf files
+merge_vcfs.py import --sample-file basedname_vcf.txt --ref kpMGH78578.fasta --prefix kp --vcf-dir .
+
+##Create merge vcf file
+merge_vcfs.py genotype --ref kpMGH78578.fasta --prefix kp
+
+##Filter the merged vcf file
+filter_tb_vcf.py --vcf tb7.2024_12_03.genotyped.vcf.gz --ref kpMGH78578.fasta
+
+##Index the filtered vcf file using vcftools
+bcftools index tb7.2024_12_03.genotyped.filtered_no_indels.vcf.gz
+
+##Convert the filtered vcf file to fasta
+vcf2fasta.py --vcf tb7.2024_12_03.genotyped.filtered_no_indels.vcf.gz --ref tbref.fasta --snps-no-filt --threads 8
+
+##Install or create new environment for snp-dists
+mamba create -n snpdists snp-dists    ###or
+conda install -c bioconda -c conda-forge snp-dists
