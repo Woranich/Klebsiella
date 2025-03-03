@@ -1,7 +1,10 @@
+#Create the txt file containin the forward and reverse fastq files and the prefix
+
+# Mapping and variant calling for multiple files
+cat kp_fastq.txt | parallel -j 2 --col-sep "\t" --bar "fastq2vcf.py all --read1 {1} --read2 {2} --ref kpMGH78578.fasta --prefix {3}"
 
 ##After finish the run do the mergevcf to create the merge vcf file 
 ##Create the new txt file containing all vcf files’ name
-
 ls *.vcf.gz > vcf.txt
 
 ##Remove the file extension
