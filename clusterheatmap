@@ -1,0 +1,12 @@
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(pheatmap)
+library(readr)
+kp_amr_count_matrix <- read_csv("kp_amr_count_matrix.csv")
+
+kp_amr_count_matrix[-ncol(kp_amr_count_matrix)] <- lapply(kp_amr_count_matrix[-ncol(kp_amr_count_matrix)], function(x) as.numeric(gsub('"', '', x)))
+
+country_gene_counts <- kp_amr_count_matrix%>%
++     group_by(Country) %>%
++     summarise(across(everything(), sum, na.rm = TRUE))                                                                                                            
