@@ -10,3 +10,33 @@ kp_amr_count_matrix[-ncol(kp_amr_count_matrix)] <- lapply(kp_amr_count_matrix[-n
 country_gene_counts <- kp_amr_count_matrix%>%
 +     group_by(Country) %>%
 +     summarise(across(everything(), sum, na.rm = TRUE))                                                                                                            
+
+print(country_gene_counts)
+
+> country_gene_counts <- country_gene_counts[rowSums(country_gene_counts[-1]) > 0, ]
+> gene_count_matrix <- as.matrix(country_gene_counts[,-1])  
+> rownames(gene_count_matrix) <- country_gene_counts$Country  
+> total_counts <- rowSums(gene_count_matrix)
+> total_counts[total_counts == 0] <- 1
+> percentage_matrix <- sweep(gene_count_matrix, 1, total_counts, FUN = "/") * 100
+> pheatmap(percentage_matrix,
++          clustering_distance_rows = "euclidean",
++          clustering_method = "complete",
++          show_rownames = TRUE,  # Keep country labels
++          show_colnames = TRUE,
++          color = colorRampPalette(c("white", "red"))(50),  # Adjusted color scale
++          main = "Percentage of AMR Genes by Country",
++          fontsize_row = 8,  # Adjust row font size
++          fontsize_col = 10,  # Adjust column font size
++          angle_col = 45)
+> 
+> pheatmap(percentage_matrix,
++          clustering_distance_rows = "euclidean",
++          clustering_method = "complete",
++          show_rownames = TRUE,  # Keep country labels
++          show_colnames = FALSE,
++          color = colorRampPalette(c("white", "red"))(50),  # Adjusted color scale
++          #main = "Percentage of AMR Genes by Country",
++          fontsize_row = 8,  # Adjust row font size
++          fontsize_col = 10,  # Adjust column font size
++          angle_col = 45)  # Rotate column names for better readability
