@@ -24,9 +24,9 @@ import os
 import shutil
 
 # Set the directory containing the mobsuite output directories
-base_directory = '/mnt/storage7/woranich/klebsiella/klebNCTC/kpasia_fasta/mobsuite_output'
+base_directory = '/mnt/storage7/woranich/klebsiella/kp_all_trimmed_assembly'
 # Set the destination directory where the renamed files will be stored
-destination_directory = '/mnt/storage7/woranich/klebsiella/klebNCTC/kpindia_fasta/kpid_plasmid'
+destination_directory = '/mnt/storage7/woranich/klebsiella/kp_all_463_plasmid'
 
 # Ensure the destination directory exists
 if not os.path.exists(destination_directory):
